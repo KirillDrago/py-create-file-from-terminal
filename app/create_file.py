@@ -1,36 +1,27 @@
-import sys
+import datetime
 import os
+import sys
 
-from datetime import datetime
+
+def create_file():
+    if '-d' in sys.argv:
+        index = 2
+        while index != len(sys.argv) and sys.argv[index] != "-f":
+            os.mkdir(sys.argv[index])
+            os.chdir(sys.argv[index])
+            index += 1
+
+    if '-f' in sys.argv:
+        with open(sys.argv[-1], "a") as file:
+            current = datetime.datetime.now()
+            file.write(f"{current.strftime('%Y-%m-%d %H:%M:%S')}\n")
+            next_line = input("Enter content line: ")
+            count_lines = 1
+            while next_line != "stop":
+                file.write(f"{count_lines} {next_line}\n")
+                next_line = input("Enter content line: ")
+                count_lines += 1
+            file.write("\n")
 
 
-def create_file(file_name: str, path: list = None) -> None:
-    if path:
-        os.makedirs("/".join(path))
-        file_name = f"{'/'.join(path)}/{file_name}"
-
-    with open(file_name, "a") as file:
-        line_number = 1
-        file.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "\n")
-        while True:
-            line = input("Enter content line: ")
-            if line.lower() == "stop":
-                break
-            file.write(f"{line_number} {line}\n")
-            line_number += 1
-def create_file_from_terminal() -> None:
-    command = sys.argv[1::]
-
-    if "-d" in command and "-f" not in command:
-        os.makedirs("/".join(command[1::]))
-
-    if "-f" in command and "-d" not in command:
-        file_to_create = command[-1]
-        create_file(file_to_create)
-
-    if "-f" in command and "-d" in command:
-        directory_flag = command.index("-d")
-        file_flag = command.index("-f")
-        name = command[file_flag + 1]
-        path = command[directory_flag + 1: file_flag]
-        create_file(name, path)
+create_file()
